@@ -59,11 +59,11 @@ namespace Restivus
             HttpMethod method,
             string path) => client.CreateRequestMessageForRelativePath(method, path);
 
-        public static Task<T> SendAsync<T>(this IRestClient client,
+        public static Task<TResponse> SendAsync<TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
-            Func<HttpResponseMessage, T> deserializeResponse)
+            Func<HttpResponseMessage, TResponse> deserializeResponse)
         {
             var message = client.CreateRequestMessage(method, relativePath);
 
@@ -72,11 +72,11 @@ namespace Restivus
             return client.RequestSender.SendAsync(message, deserializeResponse);
         }
 
-        public static Task<T> SendAsync<T>(this IRestClient client,
+        public static Task<TResponse> SendAsync<TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
-            Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             var message = client.CreateRequestMessage(method, relativePath);
 
@@ -85,39 +85,42 @@ namespace Restivus
             return client.RequestSender.SendAsync(message, deserializeResponseAsync);
         }
 
-        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+        static Action<HttpRequestMessage> _JsonPayloadSetter<TPayload>(Func<TPayload> getPayload) =>
+            message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent();
+
+        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Func<T> getPayload,
-            Func<HttpResponseMessage, T> deserializeResponse)
+            Func<TPayload> getPayload,
+            Func<HttpResponseMessage, TResponse> deserializeResponse)
         {
             return client.SendAsync(
                 method,
                 relativePath,
-                message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent(),
+                _JsonPayloadSetter(getPayload),
                 deserializeResponse
             );
         }
 
-        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Func<T> getPayload,
-            Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
+            Func<TPayload> getPayload,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return client.SendAsync(
                 method,
                 relativePath,
-                message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent(),
+                _JsonPayloadSetter(getPayload),
                 deserializeResponseAsync
             );
         }
 
-        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
-            T payload,
-            Func<HttpResponseMessage, T> deserializeResponse)
+            TPayload payload,
+            Func<HttpResponseMessage, TResponse> deserializeResponse)
         {
             return client.SendJsonAsync(
                 method,
@@ -127,11 +130,11 @@ namespace Restivus
             );
         }
 
-        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
             HttpMethod method,
             string relativePath,
-            T payload,
-            Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
+            TPayload payload,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return client.SendJsonAsync(
                 method,
