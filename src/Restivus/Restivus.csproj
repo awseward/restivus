@@ -51,6 +51,8 @@
     <Compile Include="HttpRequestSender.cs" />
     <Compile Include="Middleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestClient.cs" />
+    <Compile Include="WebApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
