@@ -49,6 +49,7 @@
       <Link>Properties\AssemblyInfo.sln.cs</Link>
     </Compile>
     <Compile Include="HttpRequestSender.cs" />
+    <Compile Include="Middleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
