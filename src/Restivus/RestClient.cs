@@ -75,6 +75,20 @@ namespace Restivus
         public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
             string absolutePath,
+            Func<T> getPayload,
+            Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
+        {
+            return client.SendAsync(
+                method,
+                absolutePath,
+                message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent(),
+                deserializeResponseAsync
+            );
+        }
+
+        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+            HttpMethod method,
+            string absolutePath,
             T payload,
             Func<HttpResponseMessage, T> deserializeResponse)
         {
@@ -86,5 +100,18 @@ namespace Restivus
             );
         }
 
+        public static Task<T> SendJsonAsync<T>(this IRestClient client,
+            HttpMethod method,
+            string absolutePath,
+            T payload,
+            Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
+        {
+            return client.SendJsonAsync(
+                method,
+                absolutePath,
+                () => payload,
+                deserializeResponseAsync
+            );
+        }
     }
 }

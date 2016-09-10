@@ -10,21 +10,22 @@ namespace Restivus
     public interface IMiddleware<T>
     {
         T Run(T thing);
-        Task<T> RunAsync(T thing);
     }
 
     public interface IHttpRequestMiddleware : IMiddleware<HttpRequestMessage> { }
 
     public class HttpRequestMiddleware : IHttpRequestMiddleware
     {
-        public HttpRequestMessage Run(HttpRequestMessage thing)
+        public HttpRequestMiddleware(Func<HttpRequestMessage, HttpRequestMessage> run)
         {
-            throw new NotImplementedException();
+            _run = run.AsNoOpIfNull();
         }
 
-        public Task<HttpRequestMessage> RunAsync(HttpRequestMessage thing)
-        {
-            throw new NotImplementedException();
-        }
+        public HttpRequestMiddleware(Action<HttpRequestMessage> run)
+            : this(run.AsFluent()) { }
+
+        readonly Func<HttpRequestMessage, HttpRequestMessage> _run;
+
+        public HttpRequestMessage Run(HttpRequestMessage thing) => _run(thing);
     }
 }

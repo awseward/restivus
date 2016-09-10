@@ -12,7 +12,7 @@ namespace Restivus.Tests
 {
     public class IntegrationTests
     {
-        static HttpClient DefaultHttpClient { get; } = new HttpClient();
+        static HttpClient _DefaultHttpClient { get; } = new HttpClient();
 
         class DummyWebApi : IWebApi
         {
@@ -25,9 +25,16 @@ namespace Restivus.Tests
         class DummyRestClient : IRestClient
         {
             public IReadOnlyCollection<IHttpRequestMiddleware> RequestMiddlewares { get; } =
-                new List<IHttpRequestMiddleware>().AsReadOnly();
+                new List<IHttpRequestMiddleware>
+                {
+                    new HttpRequestMiddleware(message =>
+                    {
+                        message.Headers.Add("X-Wing-Fighter", "Red Lobster, standing by!");
+                    }),
 
-            public IHttpRequestSender RequestSender { get; } = new HttpRequestSender(DefaultHttpClient);
+                }.AsReadOnly();
+
+            public IHttpRequestSender RequestSender { get; } = new HttpRequestSender(_DefaultHttpClient);
 
             public IWebApi WebApi { get; } = new DummyWebApi();
         }
@@ -56,7 +63,7 @@ namespace Restivus.Tests
                 HttpMethod.Get,
                 "/posts",
                 message => { },
-                async response => JsonConvert.DeserializeObject<IEnumerable<Post>>(await response.Content.ReadAsStringAsync())
+                _Deserialize<IEnumerable<Post>>
             );
 
             Assert.NotEmpty(posts);
@@ -73,14 +80,11 @@ namespace Restivus.Tests
                 Body = "This is a body.",
             };
 
-            var createdPost = await client.SendAsync(
+            var createdPost = await client.SendJsonAsync(
                 HttpMethod.Post,
                 "/posts",
-                message =>
-                {
-                    message.Content = JsonConvert.SerializeObject(localPost).AsJsonContent();
-                },
-                async response => JsonConvert.DeserializeObject<Post>(await response.Content.ReadAsStringAsync())
+                localPost,
+                _Deserialize<Post>
             );
 
             Assert.NotEqual(localPost.Id, createdPost.Id);
@@ -99,7 +103,7 @@ namespace Restivus.Tests
                 HttpMethod.Get,
                 path,
                 message => { },
-                async response => JsonConvert.DeserializeObject<Post>(await response.Content.ReadAsStringAsync())
+                _Deserialize<Post>
             );
 
             var modifiedPost = new Post
@@ -110,14 +114,11 @@ namespace Restivus.Tests
                 Body = Guid.NewGuid().ToString(),
             };
 
-            var updatedPost = await client.SendAsync(
+            var updatedPost = await client.SendJsonAsync(
                 HttpMethod.Put,
                 path,
-                message =>
-                {
-                    message.Content = JsonConvert.SerializeObject(modifiedPost).AsJsonContent();
-                },
-                async response => JsonConvert.DeserializeObject<Post>(await response.Content.ReadAsStringAsync())
+                modifiedPost,
+                _Deserialize<Post>
             );
 
             Assert.    Equal( originalPost.Id,     updatedPost.Id);
@@ -129,6 +130,11 @@ namespace Restivus.Tests
             Assert. Equal( modifiedPost.UserId, updatedPost.UserId);
             Assert. Equal( modifiedPost.Title,  updatedPost.Title);
             Assert. Equal( modifiedPost.Body,   updatedPost.Body);
+        }
+
+        static async Task<T> _Deserialize<T>(HttpResponseMessage message)
+        {
+            return JsonConvert.DeserializeObject<T>(await message.Content.ReadAsStringAsync());
         }
     }
 }
