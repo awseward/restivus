@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restivus", "src\Restivus\Restivus.csproj", "{F94359F4-1D8B-4F83-9F40-BBF0700333CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D1F1DBF2-34EE-42AE-96CD-F8ED00C07BAA}"
+	ProjectSection(SolutionItems) = preProject
+		AssemblyInfo.sln.cs = AssemblyInfo.sln.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restivus.Tests", "test\Restivus.Tests\Restivus.Tests.csproj", "{A3507A57-5810-4431-B258-A264F5944537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F94359F4-1D8B-4F83-9F40-BBF0700333CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F94359F4-1D8B-4F83-9F40-BBF0700333CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F94359F4-1D8B-4F83-9F40-BBF0700333CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F94359F4-1D8B-4F83-9F40-BBF0700333CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3507A57-5810-4431-B258-A264F5944537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3507A57-5810-4431-B258-A264F5944537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3507A57-5810-4431-B258-A264F5944537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3507A57-5810-4431-B258-A264F5944537}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
