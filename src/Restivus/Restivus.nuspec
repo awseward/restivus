@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Andrew Seward</authors>
+    <owners>Andrew Seward</owners>
+    <licenseUrl>
+      http://github.com/awseward/restivus/blob/master/LICENSE
+    </licenseUrl>
+    <projectUrl>http://github.com/awseward/restivus</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>REST HTTP client get put post json</tags>
+  </metadata>
+</package>

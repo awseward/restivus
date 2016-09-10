@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Restivus")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A simple, basic REST library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Restivus")]
 

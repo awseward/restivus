@@ -1,3 +1,3 @@
 # Restivus
 
-A simple REST library
+A simple, basic REST library
