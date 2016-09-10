@@ -17,13 +17,14 @@ namespace Restivus
 
     public static class RestClientExtensions
     {
-        public static HttpRequestMessage CreateRequestMessage(this IRestClient client,
+        static HttpRequestMessage _CreateRequestMessage(this IRestClient client,
             HttpMethod method,
-            string path)
+            string path,
+            Func<string, Uri> buildUriFromPath)
         {
             var message = new HttpRequestMessage(
                 method,
-                client.WebApi.UriForAbsolutePath(path)
+                buildUriFromPath(path)
             );
 
             return client.RequestMiddlewares.Aggregate(
@@ -32,13 +33,39 @@ namespace Restivus
             );
         }
 
+        public static HttpRequestMessage CreateRequestMessageForRelativePath(this IRestClient client,
+            HttpMethod method,
+            string path)
+        {
+            return client._CreateRequestMessage(
+                method,
+                path,
+                client.WebApi.UriForRelativePath
+            );
+        }
+
+        public static HttpRequestMessage CreateRequestMessageForAbsolutePath(this IRestClient client,
+            HttpMethod method,
+            string path)
+        {
+            return client._CreateRequestMessage(
+                method,
+                path,
+                client.WebApi.UriForAbsolutePath
+            );
+        }
+
+        public static HttpRequestMessage CreateRequestMessage(this IRestClient client,
+            HttpMethod method,
+            string path) => client.CreateRequestMessageForRelativePath(method, path);
+
         public static Task<T> SendAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
             Func<HttpResponseMessage, T> deserializeResponse)
         {
-            var message = client.CreateRequestMessage(method, absolutePath);
+            var message = client.CreateRequestMessage(method, relativePath);
 
             mutateRequestMessage(message);
 
@@ -47,11 +74,11 @@ namespace Restivus
 
         public static Task<T> SendAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
             Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
         {
-            var message = client.CreateRequestMessage(method, absolutePath);
+            var message = client.CreateRequestMessage(method, relativePath);
 
             mutateRequestMessage(message);
 
@@ -60,13 +87,13 @@ namespace Restivus
 
         public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             Func<T> getPayload,
             Func<HttpResponseMessage, T> deserializeResponse)
         {
             return client.SendAsync(
                 method,
-                absolutePath,
+                relativePath,
                 message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent(),
                 deserializeResponse
             );
@@ -74,13 +101,13 @@ namespace Restivus
 
         public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             Func<T> getPayload,
             Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
         {
             return client.SendAsync(
                 method,
-                absolutePath,
+                relativePath,
                 message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent(),
                 deserializeResponseAsync
             );
@@ -88,13 +115,13 @@ namespace Restivus
 
         public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             T payload,
             Func<HttpResponseMessage, T> deserializeResponse)
         {
             return client.SendJsonAsync(
                 method,
-                absolutePath,
+                relativePath,
                 () => payload,
                 deserializeResponse
             );
@@ -102,13 +129,13 @@ namespace Restivus
 
         public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
-            string absolutePath,
+            string relativePath,
             T payload,
             Func<HttpResponseMessage, Task<T>> deserializeResponseAsync)
         {
             return client.SendJsonAsync(
                 method,
-                absolutePath,
+                relativePath,
                 () => payload,
                 deserializeResponseAsync
             );
