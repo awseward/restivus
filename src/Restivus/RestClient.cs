@@ -44,16 +44,24 @@ namespace Restivus
             return client.RequestSender.SendAsync(message, deserializeResponse);
         }
 
-        public static Task SendAsync(this IRestClient client,
+        public static Task<T> SendJsonAsync<T>(this IRestClient client,
             HttpMethod method,
             string absolutePath,
-            Action<HttpRequestMessage> mutateRequestMessage)
+            Func<T> getPayload,
+            Func<HttpResponseMessage, T> deserializeResponse)
         {
-            var message = client.CreateRequestMessage(method, absolutePath);
+            return client.SendAsync(
+                method,
+                absolutePath,
+                message =>
+                {
+                    var payload = getPayload();
+                    var json = "TODO";
 
-            mutateRequestMessage(message);
-
-            return client.RequestSender.SendAsync(message);
+                    message.Content = json.AsJsonContent();
+                },
+                deserializeResponse
+            );
         }
     }
 }
