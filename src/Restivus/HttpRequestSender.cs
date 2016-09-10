@@ -53,7 +53,11 @@ namespace Restivus
 
                 Logger?.Debug("{response}", response);
 
-                return await deserializeResponseContentAsync(response);
+                var responseContent = await deserializeResponseContentAsync(response);
+
+                Logger?.Debug("{@responseContent}", responseContent);
+
+                return responseContent;
             }
         }
 
