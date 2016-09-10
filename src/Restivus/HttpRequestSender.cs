@@ -51,7 +51,7 @@ namespace Restivus
             {
                 response.EnsureSuccessStatusCode();
 
-                Logger?.Debug("{@response}", response);
+                Logger?.Debug("{response}", response);
 
                 return await deserializeResponseContentAsync(response);
             }
