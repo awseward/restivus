@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -27,25 +28,30 @@ namespace Restivus
 
     public partial class HttpRequestSender : IHttpRequestSender
     {
-        public HttpRequestSender(HttpClient client)
+        public HttpRequestSender(HttpClient client, ILogger logger)
         {
             HttpClient = client;
+            Logger = logger;
         }
 
+        public HttpRequestSender(HttpClient client) : this(client, null) { }
+
         public HttpClient HttpClient { get; }
+
+        public ILogger Logger { get; }
 
         public Task SendAsync(HttpRequestMessage message) => SendAsync<object>(message, _ => null);
 
         public async Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync)
         {
-            // _Logger.Debug("{message}", message);
+            Logger?.Debug("{message}", message);
 
             using (message)
             using (var response = await HttpClient.SendAsync(message))
             {
                 response.EnsureSuccessStatusCode();
 
-                // _Logger.Debug("{@response}", response);
+                Logger?.Debug("{@response}", response);
 
                 return await deserializeResponseContentAsync(response);
             }
