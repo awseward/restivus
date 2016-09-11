@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Restivus
@@ -88,11 +89,32 @@ namespace Restivus
             Action<HttpRequestMessage> mutateRequestMessage,
             Func<HttpResponseMessage, TResponse> deserializeResponse)
         {
+            return client.SendAsync(
+                method,
+                relativePath,
+                mutateRequestMessage,
+                deserializeResponse,
+                CancellationToken.None
+            );
+        }
+
+        public static Task<TResponse> SendAsync<TResponse>(
+            this IRestClient client,
+            HttpMethod method,
+            string relativePath,
+            Action<HttpRequestMessage> mutateRequestMessage,
+            Func<HttpResponseMessage, TResponse> deserializeResponse,
+            CancellationToken token)
+        {
             var message = client.CreateRequestMessage(method, relativePath);
 
             mutateRequestMessage(message);
 
-            return client.RequestSender.SendAsync(message, deserializeResponse);
+            return client.RequestSender.SendAsync(
+                message,
+                deserializeResponse,
+                token
+            );
         }
 
         public static Task<TResponse> SendAsync<TResponse>(
@@ -102,11 +124,32 @@ namespace Restivus
             Action<HttpRequestMessage> mutateRequestMessage,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
+            return client.SendAsync(
+                method,
+                relativePath,
+                mutateRequestMessage,
+                deserializeResponseAsync,
+                CancellationToken.None
+            );
+        }
+
+        public static Task<TResponse> SendAsync<TResponse>(
+            this IRestClient client,
+            HttpMethod method,
+            string relativePath,
+            Action<HttpRequestMessage> mutateRequestMessage,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken token)
+        {
             var message = client.CreateRequestMessage(method, relativePath);
 
             mutateRequestMessage(message);
 
-            return client.RequestSender.SendAsync(message, deserializeResponseAsync);
+            return client.RequestSender.SendAsync(
+                message,
+                deserializeResponseAsync,
+                token
+            );
         }
     }
 }
