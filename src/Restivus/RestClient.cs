@@ -17,7 +17,8 @@ namespace Restivus
 
     public static class RestClientExtensions
     {
-        static HttpRequestMessage _CreateRequestMessage(this IRestClient client,
+        static HttpRequestMessage _CreateRequestMessage(
+            this IRestClient client,
             HttpMethod method,
             string path,
             Func<string, Uri> buildUriFromPath)
@@ -33,7 +34,27 @@ namespace Restivus
             );
         }
 
-        public static HttpRequestMessage CreateRequestMessageForRelativePath(this IRestClient client,
+        public static ISingleMethodRequestSender For(
+            this IRestClient client,
+            HttpMethod method,
+            Func<object, HttpContent> buildContentFromPayload)
+        {
+            return new SingleMethodRequestSender(client, method, buildContentFromPayload);
+        }
+
+        public static ISingleMethodRequestSender Get(
+            this IRestClient client) => client.For(HttpMethod.Get, _ => null);
+
+        public static ISingleMethodRequestSender Put(
+            this IRestClient client,
+            Func<object, HttpContent> buildContent) => client.For(HttpMethod.Put, buildContent);
+
+        public static ISingleMethodRequestSender Post(
+            this IRestClient client,
+            Func<object, HttpContent> buildContent) => client.For(HttpMethod.Post, buildContent);
+
+        public static HttpRequestMessage CreateRequestMessageForRelativePath(
+            this IRestClient client,
             HttpMethod method,
             string path)
         {
@@ -44,7 +65,8 @@ namespace Restivus
             );
         }
 
-        public static HttpRequestMessage CreateRequestMessageForAbsolutePath(this IRestClient client,
+        public static HttpRequestMessage CreateRequestMessageForAbsolutePath(
+            this IRestClient client,
             HttpMethod method,
             string path)
         {
@@ -55,11 +77,13 @@ namespace Restivus
             );
         }
 
-        public static HttpRequestMessage CreateRequestMessage(this IRestClient client,
+        public static HttpRequestMessage CreateRequestMessage(
+            this IRestClient client,
             HttpMethod method,
             string path) => client.CreateRequestMessageForRelativePath(method, path);
 
-        public static Task<TResponse> SendAsync<TResponse>(this IRestClient client,
+        public static Task<TResponse> SendAsync<TResponse>(
+            this IRestClient client,
             HttpMethod method,
             string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
@@ -72,7 +96,8 @@ namespace Restivus
             return client.RequestSender.SendAsync(message, deserializeResponse);
         }
 
-        public static Task<TResponse> SendAsync<TResponse>(this IRestClient client,
+        public static Task<TResponse> SendAsync<TResponse>(
+            this IRestClient client,
             HttpMethod method,
             string relativePath,
             Action<HttpRequestMessage> mutateRequestMessage,
@@ -83,65 +108,6 @@ namespace Restivus
             mutateRequestMessage(message);
 
             return client.RequestSender.SendAsync(message, deserializeResponseAsync);
-        }
-
-        static Action<HttpRequestMessage> _JsonPayloadSetter<TPayload>(Func<TPayload> getPayload) =>
-            message => message.Content = JsonConvert.SerializeObject(getPayload()).AsJsonContent();
-
-        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
-            HttpMethod method,
-            string relativePath,
-            Func<TPayload> getPayload,
-            Func<HttpResponseMessage, TResponse> deserializeResponse)
-        {
-            return client.SendAsync(
-                method,
-                relativePath,
-                _JsonPayloadSetter(getPayload),
-                deserializeResponse
-            );
-        }
-
-        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
-            HttpMethod method,
-            string relativePath,
-            Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
-        {
-            return client.SendAsync(
-                method,
-                relativePath,
-                _JsonPayloadSetter(getPayload),
-                deserializeResponseAsync
-            );
-        }
-
-        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
-            HttpMethod method,
-            string relativePath,
-            TPayload payload,
-            Func<HttpResponseMessage, TResponse> deserializeResponse)
-        {
-            return client.SendJsonAsync(
-                method,
-                relativePath,
-                () => payload,
-                deserializeResponse
-            );
-        }
-
-        public static Task<TResponse> SendJsonAsync<TPayload, TResponse>(this IRestClient client,
-            HttpMethod method,
-            string relativePath,
-            TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
-        {
-            return client.SendJsonAsync(
-                method,
-                relativePath,
-                () => payload,
-                deserializeResponseAsync
-            );
         }
     }
 }
