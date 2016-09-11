@@ -59,10 +59,8 @@ namespace Restivus.Tests
         {
             var client = new DummyRestClient();
 
-            var posts = await client.SendAsync(
-                HttpMethod.Get,
+            var posts = await client.Get().SendAsync(
                 "/posts",
-                message => { },
                 _Deserialize<IEnumerable<Post>>
             );
 
@@ -80,8 +78,7 @@ namespace Restivus.Tests
                 Body = "This is a body.",
             };
 
-            var createdPost = await client.SendJsonAsync(
-                HttpMethod.Post,
+            var createdPost = await client.Post(_AsJsonContent).SendAsync(
                 "/posts",
                 localPost,
                 _Deserialize<Post>
@@ -99,10 +96,8 @@ namespace Restivus.Tests
             var client = new DummyRestClient();
             var path = "/posts/1";
 
-            var originalPost = await client.SendAsync(
-                HttpMethod.Get,
+            var originalPost = await client.Get().SendAsync(
                 path,
-                message => { },
                 _Deserialize<Post>
             );
 
@@ -114,8 +109,7 @@ namespace Restivus.Tests
                 Body = Guid.NewGuid().ToString(),
             };
 
-            var updatedPost = await client.SendJsonAsync(
-                HttpMethod.Put,
+            var updatedPost = await client.Put(_AsJsonContent).SendAsync(
                 path,
                 modifiedPost,
                 _Deserialize<Post>
@@ -130,6 +124,11 @@ namespace Restivus.Tests
             Assert. Equal( modifiedPost.UserId, updatedPost.UserId);
             Assert. Equal( modifiedPost.Title,  updatedPost.Title);
             Assert. Equal( modifiedPost.Body,   updatedPost.Body);
+        }
+
+        static HttpContent _AsJsonContent(object thing)
+        {
+            return JsonConvert.SerializeObject(thing).AsJsonContent();
         }
 
         static async Task<T> _Deserialize<T>(HttpResponseMessage message)
