@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -62,6 +63,23 @@ namespace Restivus.Tests
             );
 
             Assert.NotEmpty(users);
+        }
+
+        [Fact]
+        public async Task CancellationIsSupported()
+        {
+            var tokenSource = new CancellationTokenSource();
+            var client = new GitHubRestClient();
+
+            tokenSource.Cancel();
+
+            await Assert.ThrowsAsync<TaskCanceledException>(
+                () => client.Get().SendAsync(
+                    "/users",
+                    _DeserializeMany<User>,
+                    tokenSource.Token
+                )
+            );
         }
 
         static async Task<T> _Deserialize<T>(HttpResponseMessage response)

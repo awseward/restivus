@@ -70,7 +70,7 @@ namespace Restivus
             Logger?.Debug("{message}", message);
 
             using (message)
-            using (var response = await HttpClient.SendAsync(message, CancellationToken.None))
+            using (var response = await HttpClient.SendAsync(message, token))
             {
                 response.EnsureSuccessStatusCode();
 
