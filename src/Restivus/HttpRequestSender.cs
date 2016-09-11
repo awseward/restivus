@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Restivus
@@ -11,11 +12,12 @@ namespace Restivus
     public interface IHttpRequestSender
     {
         HttpClient HttpClient { get; }
-        Task SendAsync(HttpRequestMessage message);
-        Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContent);
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage message);
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage message, CancellationToken token);
+        Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync);
+        Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync, CancellationToken token);
         Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, T> deserializeResponseContent);
-        Task<T> SendAsync<T>(HttpRequestMessage message, Func<Task<string>, T> deserializeResponseContent);
-        Task<T> SendAsync<T>(HttpRequestMessage message, Func<string, T> deserializeResponseContent);
+        Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, T> deserializeResponseContent, CancellationToken token);
     }
 
     public partial class HttpRequestSender
@@ -40,14 +42,35 @@ namespace Restivus
 
         public ILogger Logger { get; }
 
-        public Task SendAsync(HttpRequestMessage message) => SendAsync<object>(message, _ => null);
+        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage message) => SendAsync(message, Task.FromResult);
 
-        public async Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync)
+        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage message, CancellationToken token) =>
+            SendAsync(
+                message,
+                Task.FromResult,
+                CancellationToken.None
+            );
+
+        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync) =>
+            SendAsync(
+                message,
+                deserializeResponseContentAsync,
+                CancellationToken.None
+            );
+
+        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, T> deserializeResponseContent) =>
+            SendAsync(
+                message,
+                deserializeResponseContent,
+                CancellationToken.None
+            );
+
+        public async Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync, CancellationToken token)
         {
             Logger?.Debug("{message}", message);
 
             using (message)
-            using (var response = await HttpClient.SendAsync(message))
+            using (var response = await HttpClient.SendAsync(message, CancellationToken.None))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -61,31 +84,11 @@ namespace Restivus
             }
         }
 
-        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, T> deserializeResponseContent)
-        {
-            return SendAsync(
+        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, T> deserializeResponseContent, CancellationToken token) =>
+            SendAsync(
                 message,
-                response => Task.FromResult(deserializeResponseContent(response))
+                response => Task.FromResult(deserializeResponseContent(response)),
+                token
             );
-        }
-
-        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<Task<string>, T> deserializeResponseContent)
-        {
-            return SendAsync(
-                message,
-                response => deserializeResponseContent(response.Content.ReadAsStringAsync())
-            );
-        }
-
-        public Task<T> SendAsync<T>(HttpRequestMessage message, Func<string, T> deserializeResponseContent)
-        {
-            return SendAsync(
-                message,
-                async response =>
-                {
-                    return deserializeResponseContent(await response.Content.ReadAsStringAsync());
-                }
-            );
-        }
     }
 }
