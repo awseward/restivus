@@ -16,23 +16,6 @@ namespace Restivus
 
     public static class RestClientExtensions
     {
-        static HttpRequestMessage _CreateRequestMessage(
-            this IRestClient client,
-            HttpMethod method,
-            string path,
-            Func<string, Uri> buildUriFromPath)
-        {
-            var message = new HttpRequestMessage(
-                method,
-                buildUriFromPath(path)
-            );
-
-            return client.RequestMiddlewares.Aggregate(
-                message,
-                (msg, middleware) => middleware?.Run(message)
-            );
-        }
-
         public static ISingleMethodRequestSender For(
             this IRestClient client,
             HttpMethod method,
@@ -51,6 +34,23 @@ namespace Restivus
         public static ISingleMethodRequestSender Post(
             this IRestClient client,
             Func<object, HttpContent> buildContent) => client.For(HttpMethod.Post, buildContent);
+
+        static HttpRequestMessage _CreateRequestMessage(
+            this IRestClient client,
+            HttpMethod method,
+            string path,
+            Func<string, Uri> buildUriFromPath)
+        {
+            var message = new HttpRequestMessage(
+                method,
+                buildUriFromPath(path)
+            );
+
+            return client.RequestMiddlewares.Aggregate(
+                message,
+                (msg, middleware) => middleware?.Run(message)
+            );
+        }
 
         public static HttpRequestMessage CreateRequestMessageForRelativePath(
             this IRestClient client,
