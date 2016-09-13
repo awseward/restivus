@@ -18,17 +18,17 @@ namespace Restivus
             return new StringContent(safeJson, Encoding.UTF8, "application/json");
         }
 
-        public static Func<T, T> GetNoOp<T>() => x => x;
+        public static Func<T, T> Identity<T>() => x => x;
 
         public static Func<T, T> AsNoOpIfNull<T>(this Func<T, T> function)
         {
-            return function ?? GetNoOp<T>();
+            return function ?? Identity<T>();
         }
 
         public static Func<T, T> AsFluent<T>(this Action<T> action)
         {
             return (action == null)
-                ? GetNoOp<T>()
+                ? Identity<T>()
                 : x => { action(x); return x; };
         }
     }
