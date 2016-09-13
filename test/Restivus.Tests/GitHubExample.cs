@@ -89,7 +89,7 @@ namespace Restivus.Tests
 
         static async Task<IEnumerable<T>> _DeserializeMany<T>(HttpResponseMessage response)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<T>>(await response.Content.ReadAsStringAsync())
-;        }
+            return JsonConvert.DeserializeObject<IEnumerable<T>>(await response.Content.ReadAsStringAsync());
+        }
     }
 }
