@@ -72,8 +72,6 @@ namespace Restivus
             using (message)
             using (var response = await HttpClient.SendAsync(message, token))
             {
-                response.EnsureSuccessStatusCode();
-
                 Logger?.Debug("{response}", response);
 
                 var responseContent = await deserializeResponseContentAsync(response);

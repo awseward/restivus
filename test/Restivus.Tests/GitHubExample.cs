@@ -66,6 +66,36 @@ namespace Restivus.Tests
         }
 
         [Fact]
+        public async Task Support_ThrowBased_ErrorApproach()
+        {
+            var client = new GitHubRestClient();
+
+            await Assert.ThrowsAsync<HttpRequestException>(
+                () => client.Get().SendAsync(
+                    $"/{Guid.NewGuid().ToString()}",
+                    _DeserializeMany<User>
+                )
+            );
+        }
+
+        [Fact]
+        public async Task Support_Nonthrowing_ErrorApproaches()
+        {
+            var client = new GitHubRestClient();
+
+            // This example seems a little contrived, but maybe sometime you might
+            // just want to make a request and know nothing more than whether or
+            // not it was successful, etc.
+            var wasSuccessful = await client.Post(_AsJsonContent).SendAsync(
+                $"/users",
+                new { data = "garbage" },
+                response => Task.FromResult(response.IsSuccessStatusCode)
+            );
+
+            Assert.False(wasSuccessful);
+        }
+
+        [Fact]
         public async Task CancellationIsSupported()
         {
             var tokenSource = new CancellationTokenSource();
@@ -82,14 +112,19 @@ namespace Restivus.Tests
             );
         }
 
+        static HttpContent _AsJsonContent(object thing)
+        {
+            return JsonConvert.SerializeObject(thing).AsJsonContent();
+        }
+
         static async Task<T> _Deserialize<T>(HttpResponseMessage response)
         {
+            response.EnsureSuccessStatusCode();
+
             return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
-        static async Task<IEnumerable<T>> _DeserializeMany<T>(HttpResponseMessage response)
-        {
-            return JsonConvert.DeserializeObject<IEnumerable<T>>(await response.Content.ReadAsStringAsync());
+        static Task<IEnumerable<T>> _DeserializeMany<T>(HttpResponseMessage response) =>
+            _Deserialize<IEnumerable<T>>(response);
         }
-    }
 }
