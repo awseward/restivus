@@ -45,6 +45,8 @@ class GitHubRestClient : IRestClient
 
     private async Task<T> _DeserializeJson<T>(HttpResponseMessage response)
     {
+        response.EnsureSuccessStatusCode();
+
         return JsonConvert.DeserializeObject<T>(
             await response.Content.ReadAsStringAsync()
         );
