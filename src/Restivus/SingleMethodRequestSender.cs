@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace Restivus
 {
-    // TODO: Find a better name
-    public interface ISingleMethodRequestSender
+    public interface IChainableRequestSender
     {
         HttpMethod HttpMethod { get; }
 
@@ -112,6 +111,9 @@ namespace Restivus
             Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
             CancellationToken token);
     }
+
+    [Obsolete("Prefer IChainableRequestSender")]
+    public interface ISingleMethodRequestSender : IChainableRequestSender { }
 
     public class SingleMethodRequestSender : ISingleMethodRequestSender
     {
