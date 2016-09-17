@@ -48,6 +48,7 @@
     <Compile Include="..\..\AssemblyInfo.sln.cs">
       <Link>Properties\AssemblyInfo.sln.cs</Link>
     </Compile>
+    <Compile Include="IChainableRequestSender.cs" />
     <Compile Include="SingleMethodRequestSender.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HttpRequestSender.cs" />

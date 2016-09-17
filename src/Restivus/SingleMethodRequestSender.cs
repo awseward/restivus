@@ -8,112 +8,12 @@ using System.Threading.Tasks;
 
 namespace Restivus
 {
-    public interface IChainableRequestSender
-    {
-        HttpMethod HttpMethod { get; }
-
-        Task<string> SendAsync(string path);
-
-        Task<string> SendAsync(string path, CancellationToken token);
-
-        Task<string> SendAsync(
-            string path,
-            Action<HttpRequestMessage> mutateRequest);
-
-        Task<string> SendAsync(
-            string path,
-            Action<HttpRequestMessage> mutateRequest,
-            CancellationToken token);
-
-        Task<string> SendAsync<TPayload>(
-            string path,
-            TPayload payload);
-
-        Task<string> SendAsync<TPayload>(
-            string path,
-            TPayload payload,
-            CancellationToken token);
-
-        Task<string> SendAsync<TPayload>(
-            string path,
-            Func<TPayload> getPayload);
-
-        Task<string> SendAsync<TPayload>(
-            string path,
-            Func<TPayload> getPayload,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-    }
-
     [Obsolete("Prefer IChainableRequestSender")]
-    public interface ISingleMethodRequestSender : IChainableRequestSender { }
+    public interface ISingleMethodRequestSender : IChainableRequestSender
+    {
+        [Obsolete("Avoid using this, because it is being removed in 0.6.0")]
+        HttpMethod HttpMethod { get; }
+    }
 
     public class SingleMethodRequestSender : ISingleMethodRequestSender
     {
@@ -122,7 +22,7 @@ namespace Restivus
             HttpMethod httpMethod,
             Func<object, HttpContent> createRequestContent) // Not too thrilled with this last parameter...
         {
-            HttpMethod = httpMethod;
+            _httpMethod = httpMethod;
             _RestClient = restClient;
             _createRequestContent = createRequestContent;
         }
@@ -131,7 +31,9 @@ namespace Restivus
 
         readonly Func<object, HttpContent> _createRequestContent;
 
-        public HttpMethod HttpMethod { get; }
+        readonly HttpMethod _httpMethod;
+
+        public HttpMethod HttpMethod => _httpMethod;
 
         public Task<string> SendAsync(string path) => SendAsync(path, CancellationToken.None);
 
@@ -203,7 +105,7 @@ namespace Restivus
 
         public Task<TResponse> SendAsync<TResponse>(string path, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
         {
-            return _RestClient.SendAsync(HttpMethod, path, mutateRequest, deserializeAsync, token);
+            return _RestClient.SendAsync(_httpMethod, path, mutateRequest, deserializeAsync, token);
         }
 
         public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
@@ -272,7 +174,7 @@ namespace Restivus
         public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
         {
             return _RestClient.SendAsync(
-                HttpMethod,
+                _httpMethod,
                 path,
                 request =>
                 {
