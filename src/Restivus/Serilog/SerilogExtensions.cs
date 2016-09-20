@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,18 +11,37 @@ namespace Restivus.Serilog
 {
     public static class SerilogExtensions
     {
-        public static LoggerConfiguration FilterQueryParamsFromHttpRequestMessage(
+        public static LoggerConfiguration FilterRequestQueryParams(
             this LoggerConfiguration loggerConfig,
             params string[] queryParamKeys)
         {
             return loggerConfig.Destructure.ByTransforming<HttpRequestMessage>(
-                msg => new
+                request => new
                 {
-                    msg.Method.Method,
-                    Uri = msg.RequestUri.FilterQueryParams(queryParamKeys),
-                    msg.Headers,
+                    request.Method.Method,
+                    Uri = request.RequestUri.FilterQueryParams(queryParamKeys),
+                    Headers = request.Headers._SlightlySimplified(),
                 }
             );
         }
+
+        public static LoggerConfiguration DestructureHttpResponseMessages(
+            this LoggerConfiguration loggerConfig)
+        {
+            return loggerConfig.Destructure.ByTransforming<HttpResponseMessage>(
+                response => new
+                {
+                    Status = (int) response.StatusCode,
+                    response.RequestMessage,
+                    Headers = response.Headers._SlightlySimplified(),
+                }
+            );
+        }
+
+        static IDictionary<string, string> _SlightlySimplified(this HttpHeaders headers) =>
+            headers.ToDictionary(
+                kvp => kvp.Key,
+                kvp => string.Join(", ", kvp.Value)
+            );
     }
 }
