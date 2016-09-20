@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,6 +49,7 @@
     <Compile Include="..\..\AssemblyInfo.sln.cs">
       <Link>Properties\AssemblyInfo.sln.cs</Link>
     </Compile>
+    <Compile Include="Serilog\SerilogExtensions.cs" />
     <Compile Include="SingleMethodRequestSender.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HttpRequestSender.cs" />
@@ -59,6 +61,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

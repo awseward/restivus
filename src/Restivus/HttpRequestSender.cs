@@ -67,12 +67,12 @@ namespace Restivus
 
         public async Task<T> SendAsync<T>(HttpRequestMessage message, Func<HttpResponseMessage, Task<T>> deserializeResponseContentAsync, CancellationToken token)
         {
-            Logger?.Debug("{message}", message);
+            Logger?.Debug("{@message}", message);
 
             using (message)
             using (var response = await HttpClient.SendAsync(message, token))
             {
-                Logger?.Debug("{response}", response);
+                Logger?.Debug("{@response}", response);
 
                 var responseContent = await deserializeResponseContentAsync(response);
 

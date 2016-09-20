@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Restivus
 {
@@ -16,6 +17,24 @@ namespace Restivus
                 : json;
 
             return new StringContent(safeJson, Encoding.UTF8, "application/json");
+        }
+
+        public static Uri FilterQueryParams(this Uri uri, params string[] keys)
+        {
+            var paramCollection = HttpUtility.ParseQueryString(uri.Query);
+
+            foreach (var key in keys)
+            {
+                if (paramCollection.AllKeys.Contains(key))
+                {
+                    paramCollection[key] = "__FILTERED__";
+                }
+            }
+
+            return new UriBuilder(uri)
+            {
+                Query = paramCollection.ToString(),
+            }.Uri;
         }
 
         public static Func<T, T> Identity<T>() => x => x;
