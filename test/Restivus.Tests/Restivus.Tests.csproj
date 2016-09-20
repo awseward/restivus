@@ -68,6 +68,7 @@
       <Link>Properties\AssemblyInfo.sln.cs</Link>
     </Compile>
     <Compile Include="GitHubExample.cs" />
+    <Compile Include="HttpRequestPipelineTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

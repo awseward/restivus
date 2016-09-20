@@ -49,6 +49,7 @@
     <Compile Include="..\..\AssemblyInfo.sln.cs">
       <Link>Properties\AssemblyInfo.sln.cs</Link>
     </Compile>
+    <Compile Include="IHttpRequestPipeline.cs" />
     <Compile Include="Serilog\SerilogExtensions.cs" />
     <Compile Include="SingleMethodRequestSender.cs" />
     <Compile Include="Extensions.cs" />
