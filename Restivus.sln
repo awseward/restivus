@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restivus", "src\Restivus\Re
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D1F1DBF2-34EE-42AE-96CD-F8ED00C07BAA}"
 	ProjectSection(SolutionItems) = preProject
-		AssemblyInfo.sln.cs = AssemblyInfo.sln.cs
+		AssemblyInfo.shared.cs = AssemblyInfo.shared.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restivus.Tests", "test\Restivus.Tests\Restivus.Tests.csproj", "{A3507A57-5810-4431-B258-A264F5944537}"

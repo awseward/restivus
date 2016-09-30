@@ -64,8 +64,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\AssemblyInfo.sln.cs">
-      <Link>Properties\AssemblyInfo.sln.cs</Link>
+    <Compile Include="..\..\AssemblyInfo.shared.cs">
+      <Link>AssemblyInfo.shared.cs</Link>
     </Compile>
     <Compile Include="GitHubExample.cs" />
     <Compile Include="IntegrationTests.cs" />
