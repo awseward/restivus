@@ -46,8 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\AssemblyInfo.sln.cs">
-      <Link>Properties\AssemblyInfo.sln.cs</Link>
+    <Compile Include="..\..\AssemblyInfo.shared.cs">
+      <Link>Properties\AssemblyInfo.shared.cs</Link>
     </Compile>
     <Compile Include="Serilog\SerilogExtensions.cs" />
     <Compile Include="SingleMethodRequestSender.cs" />
