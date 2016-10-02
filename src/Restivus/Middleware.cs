@@ -18,7 +18,7 @@ namespace Restivus
     {
         public HttpRequestMiddleware(Func<HttpRequestMessage, HttpRequestMessage> run)
         {
-            _run = run.AsNoOpIfNull();
+            _run = run.AsIdentityIfNull();
         }
 
         public HttpRequestMiddleware(Action<HttpRequestMessage> run)
