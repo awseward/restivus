@@ -36,6 +36,11 @@ namespace Restivus
             });
         }
 
+        public static HttpRequestMessage FilterQueryParams(this HttpRequestMessage request, params string[] keys)
+        {
+            return request.UpdateRequestUri(uri => uri.FilterQueryParams(keys));
+        }
+
         public static Uri SetQueryParams(this Uri uri, string key, string value)
         {
             return uri.UpdateQueryParams(queryParams =>
@@ -43,6 +48,11 @@ namespace Restivus
                 queryParams.Set(key, value);
                 return queryParams;
             });
+        }
+
+        public static HttpRequestMessage SetQueryParams(this HttpRequestMessage request, string key, string value)
+        {
+            return request.UpdateRequestUri(uri => uri.SetQueryParams(key, value));
         }
 
         public static Uri SetQueryParams(this Uri uri, IDictionary<string, string> queryParams)
@@ -58,12 +68,29 @@ namespace Restivus
             });
         }
 
+        public static HttpRequestMessage SetQueryParams(this HttpRequestMessage request, IDictionary<string, string> queryParams)
+        {
+            return request.UpdateRequestUri(uri => uri.SetQueryParams(queryParams));
+        }
+
         public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
         {
             return new UriBuilder(uri)
             {
                 Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
             }.Uri;
+        }
+
+        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
+        {
+            return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
+        }
+
+        public static HttpRequestMessage UpdateRequestUri(this HttpRequestMessage request, Func<Uri, Uri> updateFn)
+        {
+            request.RequestUri = updateFn(request.RequestUri);
+
+            return request;
         }
 
         public static Func<T, T> Identity<T>() => x => x;
