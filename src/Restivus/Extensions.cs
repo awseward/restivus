@@ -39,7 +39,7 @@ namespace Restivus
 
         public static Func<T, T> Identity<T>() => x => x;
 
-        public static Func<T, T> AsNoOpIfNull<T>(this Func<T, T> function)
+        public static Func<T, T> AsIdentityIfNull<T>(this Func<T, T> function)
         {
             return function ?? Identity<T>();
         }
@@ -50,5 +50,8 @@ namespace Restivus
                 ? Identity<T>()
                 : x => { action(x); return x; };
         }
+
+        [Obsolete("Prefere AsIdentityIfNull")]
+        public static Func<T, T> AsNoOpIfNull<T>(this Func<T, T> function) => AsIdentityIfNull(function);
     }
 }
