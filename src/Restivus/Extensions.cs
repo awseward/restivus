@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -21,19 +22,47 @@ namespace Restivus
 
         public static Uri FilterQueryParams(this Uri uri, params string[] keys)
         {
-            var paramCollection = HttpUtility.ParseQueryString(uri.Query);
-
-            foreach (var key in keys)
+            return uri.UpdateQueryParams(queryParams =>
             {
-                if (paramCollection.AllKeys.Contains(key))
+                foreach (var key in keys)
                 {
-                    paramCollection[key] = "__FILTERED__";
+                    if (queryParams.AllKeys.Contains(key))
+                    {
+                        queryParams[key] = "__FILTERED__";
+                    }
                 }
-            }
 
+                return queryParams;
+            });
+        }
+
+        public static Uri SetQueryParams(this Uri uri, string key, string value)
+        {
+            return uri.UpdateQueryParams(queryParams =>
+            {
+                queryParams.Set(key, value);
+                return queryParams;
+            });
+        }
+
+        public static Uri SetQueryParams(this Uri uri, IDictionary<string, string> queryParams)
+        {
+            return uri.UpdateQueryParams(qParams =>
+            {
+                foreach (var kvp in queryParams)
+                {
+                    qParams.Set(kvp.Key, kvp.Value);
+                }
+
+                return qParams;
+            });
+        }
+
+        public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
+        {
             return new UriBuilder(uri)
             {
-                Query = paramCollection.ToString(),
+                Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
             }.Uri;
         }
 
