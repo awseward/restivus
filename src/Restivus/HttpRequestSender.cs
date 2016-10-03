@@ -76,7 +76,14 @@ namespace Restivus
 
                 var responseContent = await deserializeResponseContentAsync(response);
 
-                Logger?.Debug("{@responseContent}", responseContent);
+                {
+                    var asResponseMessage = responseContent as HttpResponseMessage;
+
+                    if (asResponseMessage == null || asResponseMessage != response)
+                    {
+                        Logger?.Debug("{@responseContent}", responseContent);
+                    }
+                }
 
                 return responseContent;
             }
