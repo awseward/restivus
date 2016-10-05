@@ -4,8 +4,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
+#if NETSTANDARD13
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
+#elif NET4_5
 using System.Web;
+#endif
 
 namespace Restivus
 {
@@ -26,7 +30,11 @@ namespace Restivus
             {
                 foreach (var key in keys)
                 {
+#if NETSTANDARD13
+                    if (queryParams.ContainsKey(key))
+#elif NET4_5
                     if (queryParams.AllKeys.Contains(key))
+#endif
                     {
                         queryParams[key] = "__FILTERED__";
                     }
@@ -45,7 +53,7 @@ namespace Restivus
         {
             return uri.UpdateQueryParams(queryParams =>
             {
-                queryParams.Set(key, value);
+                queryParams[key] =  value;
                 return queryParams;
             });
         }
@@ -61,7 +69,7 @@ namespace Restivus
             {
                 foreach (var kvp in queryParams)
                 {
-                    qParams.Set(kvp.Key, kvp.Value);
+                    qParams[kvp.Key] = kvp.Value;
                 }
 
                 return qParams;
@@ -73,15 +81,27 @@ namespace Restivus
             return request.UpdateRequestUri(uri => uri.SetQueryParams(queryParams));
         }
 
+#if NETSTANDARD13
+        public static Uri UpdateQueryParams(this Uri uri, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
+#elif NET4_5
         public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
+#endif
         {
             return new UriBuilder(uri)
             {
+#if NETSTANDARD13
+                Query = updateFn(QueryHelpers.ParseQuery(uri.Query)).ToString(),
+#elif NET4_5
                 Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
+#endif
             }.Uri;
         }
 
+#if NETSTANDARD13
+        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
+#elif NET4_5
         public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
+#endif
         {
             return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
         }
