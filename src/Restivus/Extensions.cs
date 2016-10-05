@@ -85,28 +85,33 @@ namespace Restivus
 
 #if NETSTANDARD13
         public static Uri UpdateQueryParams(this Uri uri, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
-#elif NET4_5
-        public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
-#endif
         {
             return new UriBuilder(uri)
             {
-#if NETSTANDARD13
                 Query = updateFn(QueryHelpers.ParseQuery(uri.Query)).ToString(),
-#elif NET4_5
-                Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
-#endif
             }.Uri;
         }
+#elif NET4_5
+        public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
+        {
+            return new UriBuilder(uri)
+            {
+                Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
+            }.Uri;
+        }
+#endif
 
 #if NETSTANDARD13
         public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
-#elif NET4_5
-        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
-#endif
         {
             return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
         }
+#elif NET4_5
+        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
+        {
+            return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
+        }
+#endif
 
         public static HttpRequestMessage UpdateRequestUri(this HttpRequestMessage request, Func<Uri, Uri> updateFn)
         {
