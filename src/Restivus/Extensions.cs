@@ -30,11 +30,13 @@ namespace Restivus
             {
                 foreach (var key in keys)
                 {
+                    var shouldFilter =
 #if NETSTANDARD13
-                    if (queryParams.ContainsKey(key))
+                        queryParams.ContainsKey(key);
 #elif NET4_5
-                    if (queryParams.AllKeys.Contains(key))
+                        queryParams.AllKeys.Contains(key);
 #endif
+                    if(shouldFilter)
                     {
                         queryParams[key] = "__FILTERED__";
                     }
