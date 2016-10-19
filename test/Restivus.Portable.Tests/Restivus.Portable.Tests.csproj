@@ -8,7 +8,7 @@
     <ProjectGuid>{1B044901-F691-428A-9E43-03B5B5F3AFC4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Restivus.Portable.Tests</RootNamespace>
+    <RootNamespace>Restivus.Tests</RootNamespace>
     <AssemblyName>Restivus.Portable.Tests</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
@@ -39,7 +39,15 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitHubExample.cs" />
+    <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Restivus.Portable\Restivus.Portable.csproj">
+      <Project>{7b035de5-9408-4b80-905a-9d55fc7dd8eb}</Project>
+      <Name>Restivus.Portable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

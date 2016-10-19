@@ -5,7 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace Restivus
 {
@@ -26,7 +27,7 @@ namespace Restivus
             {
                 foreach (var key in keys)
                 {
-                    if (queryParams.AllKeys.Contains(key))
+                    if (queryParams.ContainsKey(key))
                     {
                         queryParams[key] = "__FILTERED__";
                     }
@@ -45,7 +46,7 @@ namespace Restivus
         {
             return uri.UpdateQueryParams(queryParams =>
             {
-                queryParams.Set(key, value);
+                queryParams[key] = value;
                 return queryParams;
             });
         }
@@ -61,7 +62,7 @@ namespace Restivus
             {
                 foreach (var kvp in queryParams)
                 {
-                    qParams.Set(kvp.Key, kvp.Value);
+                    qParams[kvp.Key] = kvp.Value;
                 }
 
                 return qParams;
@@ -73,15 +74,15 @@ namespace Restivus
             return request.UpdateRequestUri(uri => uri.SetQueryParams(queryParams));
         }
 
-        public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
+        public static Uri UpdateQueryParams(this Uri uri, Func<IDictionary<string, StringValues>, IDictionary<string, StringValues>> updateFn)
         {
             return new UriBuilder(uri)
             {
-                Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
+                Query = updateFn(QueryHelpers.ParseQuery(uri.Query)).ToString(),
             }.Uri;
         }
 
-        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
+        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<IDictionary<string, StringValues>, IDictionary<string, StringValues>> updateFn)
         {
             return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
         }
