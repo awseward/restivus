@@ -4,8 +4,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
+#if NETSTANDARD13
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
+#elif NET4_5
 using System.Web;
+#endif
 
 namespace Restivus
 {
@@ -26,7 +30,13 @@ namespace Restivus
             {
                 foreach (var key in keys)
                 {
-                    if (queryParams.AllKeys.Contains(key))
+                    var shouldFilter =
+#if NETSTANDARD13
+                        queryParams.ContainsKey(key);
+#elif NET4_5
+                        queryParams.AllKeys.Contains(key);
+#endif
+                    if(shouldFilter)
                     {
                         queryParams[key] = "__FILTERED__";
                     }
@@ -45,7 +55,7 @@ namespace Restivus
         {
             return uri.UpdateQueryParams(queryParams =>
             {
-                queryParams.Set(key, value);
+                queryParams[key] =  value;
                 return queryParams;
             });
         }
@@ -61,7 +71,7 @@ namespace Restivus
             {
                 foreach (var kvp in queryParams)
                 {
-                    qParams.Set(kvp.Key, kvp.Value);
+                    qParams[kvp.Key] = kvp.Value;
                 }
 
                 return qParams;
@@ -73,6 +83,15 @@ namespace Restivus
             return request.UpdateRequestUri(uri => uri.SetQueryParams(queryParams));
         }
 
+#if NETSTANDARD13
+        public static Uri UpdateQueryParams(this Uri uri, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
+        {
+            return new UriBuilder(uri)
+            {
+                Query = updateFn(QueryHelpers.ParseQuery(uri.Query)).ToString(),
+            }.Uri;
+        }
+#elif NET4_5
         public static Uri UpdateQueryParams(this Uri uri, Func<NameValueCollection, NameValueCollection> updateFn)
         {
             return new UriBuilder(uri)
@@ -80,11 +99,19 @@ namespace Restivus
                 Query = updateFn(HttpUtility.ParseQueryString(uri.Query)).ToString(),
             }.Uri;
         }
+#endif
 
+#if NETSTANDARD13
+        public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<Dictionary<string, StringValues>, Dictionary<string, StringValues>> updateFn)
+        {
+            return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
+        }
+#elif NET4_5
         public static HttpRequestMessage UpdateQueryParams(this HttpRequestMessage request, Func<NameValueCollection, NameValueCollection> updateFn)
         {
             return request.UpdateRequestUri(uri => uri.UpdateQueryParams(updateFn));
         }
+#endif
 
         public static HttpRequestMessage UpdateRequestUri(this HttpRequestMessage request, Func<Uri, Uri> updateFn)
         {
