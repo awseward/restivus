@@ -1,0 +1,13 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "NETStandard.Library": "1.6.0",
+    "xunit": "2.2.0-beta3-build3402",
+    "xunit.runner.console": "2.2.0-beta3-build3402",
+    "xunit.runner.visualstudio": "2.2.0-beta3-build1187"
+  },
+  "frameworks": {
+    "netstandard1.3": {}
+  }
+}
