@@ -15,7 +15,7 @@ namespace Restivus
 
         Task<string> SendAsync(string path);
 
-        Task<string> SendAsync(string path, CancellationToken token);
+        Task<string> SendAsync(string path, CancellationToken cancellationToken);
 
         Task<string> SendAsync(
             string path,
@@ -24,7 +24,7 @@ namespace Restivus
         Task<string> SendAsync(
             string path,
             Action<HttpRequestMessage> mutateRequest,
-            CancellationToken token);
+            CancellationToken cancellationToken);
 
         Task<string> SendAsync<TPayload>(
             string path,
@@ -33,7 +33,7 @@ namespace Restivus
         Task<string> SendAsync<TPayload>(
             string path,
             TPayload payload,
-            CancellationToken token);
+            CancellationToken cancellationToken);
 
         Task<string> SendAsync<TPayload>(
             string path,
@@ -42,75 +42,75 @@ namespace Restivus
         Task<string> SendAsync<TPayload>(
             string path,
             Func<TPayload> getPayload,
-            CancellationToken token);
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TResponse>(
             string path,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
         Task<TResponse> SendAsync<TResponse>(
             string path,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TResponse>(
             string path,
             Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
+
+        Task<TResponse> SendAsync<TResponse>(
+            string path,
+            Action<HttpRequestMessage> mutateRequest,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
-            TPayload getPayload,
+            TPayload payload,
             Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
-            TPayload getPayload,
+            TPayload payload,
             Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
 
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             Func<TPayload> getPayload,
             Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeAsync,
-            CancellationToken token);
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
+
+        Task<TResponse> SendAsync<TPayload, TResponse>(
+            string path,
+            Func<TPayload> getPayload,
+            Action<HttpRequestMessage> mutateRequest,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
     }
 
     public class SingleMethodRequestSender : ISingleMethodRequestSender
@@ -133,11 +133,11 @@ namespace Restivus
 
         public Task<string> SendAsync(string path) => SendAsync(path, CancellationToken.None);
 
-        public Task<string> SendAsync(string path, CancellationToken token) =>
+        public Task<string> SendAsync(string path, CancellationToken cancellationToken) =>
             SendAsync(
                 path,
                 request => { },
-                token
+                cancellationToken
             );
 
         public Task<string> SendAsync(string path, Action<HttpRequestMessage> mutateRequest)
@@ -145,13 +145,13 @@ namespace Restivus
             return SendAsync(path, mutateRequest, CancellationToken.None);
         }
 
-        public Task<string> SendAsync(string path, Action<HttpRequestMessage> mutateRequest, CancellationToken token)
+        public Task<string> SendAsync(string path, Action<HttpRequestMessage> mutateRequest, CancellationToken cancellationToken)
         {
             return SendAsync(
                 path,
                 mutateRequest,
                 async response => await response.Content.ReadAsStringAsync(),
-                token
+                cancellationToken
             );
         }
 
@@ -160,12 +160,12 @@ namespace Restivus
             return SendAsync(path, payload, CancellationToken.None);
         }
 
-        public Task<string> SendAsync<TPayload>(string path, TPayload payload, CancellationToken token)
+        public Task<string> SendAsync<TPayload>(string path, TPayload payload, CancellationToken cancellationToken)
         {
             return SendAsync(
                 path,
                 () => payload,
-                token
+                cancellationToken
             );
         }
 
@@ -174,100 +174,100 @@ namespace Restivus
             return SendAsync(path, getPayload, CancellationToken.None);
         }
 
-        public Task<string> SendAsync<TPayload>(string path, Func<TPayload> getPayload, CancellationToken token)
+        public Task<string> SendAsync<TPayload>(string path, Func<TPayload> getPayload, CancellationToken cancellationToken)
         {
             return SendAsync(
                 path,
                 getPayload,
                 async response => await response.Content.ReadAsStringAsync(),
-                token
+                cancellationToken
             );
         }
 
-        public Task<TResponse> SendAsync<TResponse>(string path, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TResponse>(string path, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
-            return SendAsync(path, deserializeAsync, CancellationToken.None);
+            return SendAsync(path, deserializeResponseAsync, CancellationToken.None);
         }
 
-        public Task<TResponse> SendAsync<TResponse>(string path, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TResponse>(string path, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
-            return SendAsync(path, request => { }, deserializeAsync, token);
+            return SendAsync(path, request => { }, deserializeResponseAsync, cancellationToken);
         }
 
-        public Task<TResponse> SendAsync<TResponse>(string path, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TResponse>(string path, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
-            return SendAsync(path, mutateRequest, deserializeAsync, CancellationToken.None);
+            return SendAsync(path, mutateRequest, deserializeResponseAsync, CancellationToken.None);
         }
 
-        public Task<TResponse> SendAsync<TResponse>(string path, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TResponse>(string path, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
-            return _RestClient.SendAsync(HttpMethod, path, mutateRequest, deserializeAsync, token);
+            return _RestClient.SendAsync(HttpMethod, path, mutateRequest, deserializeResponseAsync, cancellationToken);
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
-            return SendAsync(path, payload, deserializeAsync, CancellationToken.None);
+            return SendAsync(path, payload, deserializeResponseAsync, CancellationToken.None);
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
-            return SendAsync(path, () => payload, deserializeAsync, token);
+            return SendAsync(path, () => payload, deserializeResponseAsync, cancellationToken);
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return SendAsync(
                 path,
                 getPayload,
-                deserializeAsync,
+                deserializeResponseAsync,
                 CancellationToken.None);
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
             return SendAsync(
                 path,
                 getPayload,
                 _ => { },
-                deserializeAsync,
-                token
+                deserializeResponseAsync,
+                cancellationToken
             );
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return SendAsync(
                 path,
                 payload,
                 mutateRequest,
-                deserializeAsync,
+                deserializeResponseAsync,
                 CancellationToken.None
             );
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, TPayload payload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
             return SendAsync(
                 path,
                 () => payload,
                 mutateRequest,
-                deserializeAsync,
-                token
+                deserializeResponseAsync,
+                cancellationToken
             );
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return SendAsync(
                 path,
                 getPayload,
                 mutateRequest,
-                deserializeAsync,
+                deserializeResponseAsync,
                 CancellationToken.None
             );
         }
 
-        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeAsync, CancellationToken token)
+        public Task<TResponse> SendAsync<TPayload, TResponse>(string path, Func<TPayload> getPayload, Action<HttpRequestMessage> mutateRequest, Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync, CancellationToken cancellationToken)
         {
             return _RestClient.SendAsync(
                 HttpMethod,
@@ -277,8 +277,8 @@ namespace Restivus
                     request.Content = _createRequestContent(getPayload());
                     mutateRequest(request);
                 },
-                deserializeAsync,
-                token
+                deserializeResponseAsync,
+                cancellationToken
             );
         }
     }
