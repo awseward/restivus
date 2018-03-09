@@ -56,3 +56,17 @@ class GitHubRestClient : IRestClient
 [JsonObject]
 class GitHubUser { /* ... */ }
 ```
+
+### Publishing
+
+Mostly a reminder for myself since I publish so infrequently:
+
+```sh
+git clean -xdf
+
+# Build in Release config in VS
+
+nuget pack -Properties Configuration=Release src/Restivus/Restivus.csproj
+
+nuget push Restivus.<version>.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $NUGET_API_KEY
+```
