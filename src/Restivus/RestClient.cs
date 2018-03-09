@@ -121,13 +121,13 @@ namespace Restivus
             this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Action<HttpRequestMessage> mutateRequestMessage,
+            Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, TResponse> deserializeResponse)
         {
             return client.SendAsync(
                 method,
                 relativePath,
-                mutateRequestMessage,
+                mutateRequest,
                 deserializeResponse,
                 CancellationToken.None
             );
