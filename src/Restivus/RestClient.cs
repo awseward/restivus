@@ -172,18 +172,18 @@ namespace Restivus
             this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Action<HttpRequestMessage> mutateRequestMessage,
+            Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, TResponse> deserializeResponse,
-            CancellationToken token)
+            CancellationToken cancellationToken)
         {
             var message = client.CreateRequestMessage(method, relativePath);
 
-            mutateRequestMessage(message);
+            mutateRequest(message);
 
             return client.RequestSender.SendAsync(
                 message,
                 deserializeResponse,
-                token
+                cancellationToken
             );
         }
 
@@ -191,13 +191,13 @@ namespace Restivus
             this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Action<HttpRequestMessage> mutateRequestMessage,
+            Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync)
         {
             return client.SendAsync(
                 method,
                 relativePath,
-                mutateRequestMessage,
+                mutateRequest,
                 deserializeResponseAsync,
                 CancellationToken.None
             );
@@ -207,18 +207,18 @@ namespace Restivus
             this IRestClient client,
             HttpMethod method,
             string relativePath,
-            Action<HttpRequestMessage> mutateRequestMessage,
+            Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken token)
+            CancellationToken cancellationToken)
         {
             var message = client.CreateRequestMessage(method, relativePath);
 
-            mutateRequestMessage(message);
+            mutateRequest(message);
 
             return client.RequestSender.SendAsync(
                 message,
                 deserializeResponseAsync,
-                token
+                cancellationToken
             );
         }
     }
