@@ -187,6 +187,7 @@ namespace Restivus
             );
         }
 
+        [Obsolete(Deprecations.NO_CANCELLATION)]
         public static Task<TResponse> SendAsync<TResponse>(
             this IRestClient client,
             HttpMethod method,

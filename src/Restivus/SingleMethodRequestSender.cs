@@ -13,104 +13,114 @@ namespace Restivus
     {
         HttpMethod HttpMethod { get; }
 
-        Task<string> SendAsync(string path);
-
         Task<string> SendAsync(string path, CancellationToken cancellationToken);
 
         Task<string> SendAsync(
             string path,
-            Action<HttpRequestMessage> mutateRequest);
-
-        Task<string> SendAsync(
-            string path,
             Action<HttpRequestMessage> mutateRequest,
             CancellationToken cancellationToken);
 
+        Task<string> SendAsync<TPayload>(
+            string path,
+            TPayload payload,
+            CancellationToken cancellationToken);
+
+        Task<string> SendAsync<TPayload>(
+            string path,
+            Func<TPayload> getPayload,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TResponse>(
+            string path,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TResponse>(
+            string path,
+            Action<HttpRequestMessage> mutateRequest,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TPayload, TResponse>(
+            string path,
+            TPayload payload,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TPayload, TResponse>(
+            string path,
+            Func<TPayload> getPayload,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TPayload, TResponse>(
+            string path,
+            TPayload payload,
+            Action<HttpRequestMessage> mutateRequest,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        Task<TResponse> SendAsync<TPayload, TResponse>(
+            string path,
+            Func<TPayload> getPayload,
+            Action<HttpRequestMessage> mutateRequest,
+            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
+            CancellationToken cancellationToken);
+
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
+        Task<string> SendAsync(string path);
+
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<string> SendAsync<TPayload>(
             string path,
             TPayload payload);
 
-        Task<string> SendAsync<TPayload>(
-            string path,
-            TPayload payload,
-            CancellationToken cancellationToken);
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
+        Task<string> SendAsync(
+             string path,
+             Action<HttpRequestMessage> mutateRequest);
 
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<string> SendAsync<TPayload>(
             string path,
             Func<TPayload> getPayload);
 
-        Task<string> SendAsync<TPayload>(
-            string path,
-            Func<TPayload> getPayload,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TResponse>(
             string path,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TResponse>(
             string path,
             Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
-        Task<TResponse> SendAsync<TResponse>(
-            string path,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             TPayload payload,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload payload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             Func<TPayload> getPayload,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             TPayload payload,
             Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
 
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            TPayload payload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
-
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
         Task<TResponse> SendAsync<TPayload, TResponse>(
             string path,
             Func<TPayload> getPayload,
             Action<HttpRequestMessage> mutateRequest,
             Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync);
-
-        Task<TResponse> SendAsync<TPayload, TResponse>(
-            string path,
-            Func<TPayload> getPayload,
-            Action<HttpRequestMessage> mutateRequest,
-            Func<HttpResponseMessage, Task<TResponse>> deserializeResponseAsync,
-            CancellationToken cancellationToken);
     }
 
     public class SingleMethodRequestSender : ISingleMethodRequestSender
