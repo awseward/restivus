@@ -33,7 +33,7 @@ namespace Restivus.Tests
         class GitHubRestClient : IRestClient
         {
             public IReadOnlyCollection<IHttpRequestMiddleware> RequestMiddlewares { get; } =
-                new List<IHttpRequestMiddleware>().AsReadOnly();
+                new List<IHttpRequestMiddleware>();
 
             public IHttpRequestSender RequestSender { get; } = new HttpRequestSender(_DefaultHttpClient);
 

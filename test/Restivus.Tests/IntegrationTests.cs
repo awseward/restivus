@@ -27,12 +27,11 @@ namespace Restivus.Tests
             public IReadOnlyCollection<IHttpRequestMiddleware> RequestMiddlewares { get; } =
                 new List<IHttpRequestMiddleware>
                 {
-                    new HttpRequestMiddleware(message =>
+                    new HttpRequestMiddleware(request =>
                     {
-                        message.Headers.Add("X-Wing-Fighter", "Red Lobster, standing by!");
+                        request.Headers.Add("X-Wing-Fighter", "Red Lobster, standing by!");
                     }),
-
-                }.AsReadOnly();
+                };
 
             public IHttpRequestSender RequestSender { get; } = new HttpRequestSender(_DefaultHttpClient);
 

@@ -12,6 +12,9 @@ namespace Restivus
     public interface IHttpRequestSender
     {
         HttpClient HttpClient { get; }
+
+        IReadOnlyCollection<Func<HttpResponseMessage, Task>> ResponseMiddlewares { get; }
+
         Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken);
         Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, Task<T>> deserializeResponseAsync, CancellationToken cancellationToken);
         Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, T> deserializeResponse, CancellationToken cancellationToken);
@@ -34,15 +37,21 @@ namespace Restivus
 
     public partial class HttpRequestSender : IHttpRequestSender
     {
-        public HttpRequestSender(HttpClient client, ILogger logger)
+        public HttpRequestSender(
+            HttpClient client,
+            ILogger logger,
+            IReadOnlyCollection<Func<HttpResponseMessage, Task>> responseMiddlewares)
         {
             HttpClient = client;
             Logger = logger;
+            ResponseMiddlewares = responseMiddlewares;
         }
 
-        public HttpRequestSender(HttpClient client) : this(client, null) { }
+        public HttpRequestSender(HttpClient client) : this(client, null, new List<Func<HttpResponseMessage, Task>>()) { }
 
         public HttpClient HttpClient { get; }
+
+        public IReadOnlyCollection<Func<HttpResponseMessage, Task>> ResponseMiddlewares { get; }
 
         [Obsolete]
         public ILogger Logger { get; }
@@ -78,6 +87,11 @@ namespace Restivus
             using (var response = await HttpClient.SendAsync(request, cancellationToken))
             {
                 Logger?.Debug("{@response}", response);
+
+                foreach (var middleware in ResponseMiddlewares)
+                {
+                    await middleware(response);
+                }
 
                 var responseContent = await deserializeResponseAsync(response);
 
