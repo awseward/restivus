@@ -44,6 +44,7 @@ namespace Restivus
 
         public HttpClient HttpClient { get; }
 
+        [Obsolete]
         public ILogger Logger { get; }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request) => SendAsync(request, Task.FromResult);
