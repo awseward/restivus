@@ -42,6 +42,9 @@
     <Compile Include="..\..\AssemblyInfo.shared.cs">
       <Link>Properties\AssemblyInfo.shared.cs</Link>
     </Compile>
+    <Compile Include="..\Restivus\Deprecations.cs">
+      <Link>Deprecations.cs</Link>
+    </Compile>
     <Compile Include="..\Restivus\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>

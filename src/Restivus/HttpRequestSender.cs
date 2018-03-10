@@ -9,11 +9,6 @@ using System.Threading.Tasks;
 
 namespace Restivus
 {
-    internal static class Deprecations
-    {
-        internal const string NO_CANCELLATION = "Prefer alternative accepting a System.Threading.CancellationToken";
-    }
-
     public interface IHttpRequestSender
     {
         HttpClient HttpClient { get; }

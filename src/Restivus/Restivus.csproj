@@ -49,6 +49,7 @@
     <Compile Include="..\..\AssemblyInfo.shared.cs">
       <Link>Properties\AssemblyInfo.shared.cs</Link>
     </Compile>
+    <Compile Include="Deprecations.cs" />
     <Compile Include="Serilog\SerilogExtensions.cs" />
     <Compile Include="SingleMethodRequestSender.cs" />
     <Compile Include="Extensions.cs" />
