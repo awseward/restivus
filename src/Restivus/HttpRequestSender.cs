@@ -9,15 +9,24 @@ using System.Threading.Tasks;
 
 namespace Restivus
 {
+    internal static class Deprecations
+    {
+        internal const string NO_CANCELLATION = "Prefer alternative accepting a System.Threading.CancellationToken";
+    }
+
     public interface IHttpRequestSender
     {
         HttpClient HttpClient { get; }
-        Task<HttpResponseMessage> SendAsync(HttpRequestMessage request);
         Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken);
-        Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, Task<T>> deserializeResponseAsync);
         Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, Task<T>> deserializeResponseAsync, CancellationToken cancellationToken);
-        Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, T> deserializeResponse);
         Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, T> deserializeResponse, CancellationToken cancellationToken);
+
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage request);
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
+        Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, T> deserializeResponse);
+        [Obsolete(message: Deprecations.NO_CANCELLATION)]
+        Task<T> SendAsync<T>(HttpRequestMessage request, Func<HttpResponseMessage, Task<T>> deserializeResponseAsync);
     }
 
     public partial class HttpRequestSender
